@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class ViewRef<VM extends StateNotifier<S>, S> {
   final WidgetRef ref;
@@ -28,6 +28,21 @@ abstract class ConsumerView<VM extends StateNotifier<S>, S>
 
   // NOTE: Providerをコンストラクタで渡すと継承クラスのコンストラクタをconstにできなくなるので
   // getterを継承する形でProviderを宣言させる
+  StateNotifierProvider<VM, S> get provider;
+
+  Widget buildView(BuildContext context, ViewRef<VM, S> ref);
+}
+
+abstract class HookConsumerView<VM extends StateNotifier<S>, S>
+    extends HookConsumerWidget {
+  const HookConsumerView({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewRef = ViewRef<VM, S>(ref, provider);
+    return buildView(context, viewRef);
+  }
+
   StateNotifierProvider<VM, S> get provider;
 
   Widget buildView(BuildContext context, ViewRef<VM, S> ref);

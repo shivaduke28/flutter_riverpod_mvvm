@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_counter/product.dart';
+import 'package:flutter_counter/ui/cart_view.dart';
 import 'package:flutter_counter/ui/product_view.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'ui/cart_view.dart';
 
 void main() {
   runApp(
