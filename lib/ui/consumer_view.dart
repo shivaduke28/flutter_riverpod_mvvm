@@ -26,6 +26,8 @@ abstract class ConsumerView<VM extends StateNotifier<S>, S>
     return buildView(context, viewRef);
   }
 
+  // NOTE: Providerをコンストラクタで渡すと継承クラスのコンストラクタをconstにできなくなるので
+  // getterを継承する形でProviderを宣言させる
   StateNotifierProvider<VM, S> get provider;
 
   Widget buildView(BuildContext context, ViewRef<VM, S> ref);
