@@ -4,18 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../cart.dart';
 import 'consumer_view.dart';
 
-@immutable
-class ProductViewState {
-  final Product product;
-  final int count;
-  final bool favorite;
-
-  const ProductViewState({
-    required this.product,
-    this.count = 0,
-    this.favorite = false,
-  });
-}
+typedef ProductViewState = ({Product product, int count, bool favorite});
 
 class ProductViewModel extends StateNotifier<ProductViewState> {
   final Ref ref;
@@ -26,7 +15,7 @@ class ProductViewModel extends StateNotifier<ProductViewState> {
         return cartState.items[state.product.id];
       }),
       (previous, next) {
-        state = ProductViewState(
+        state = (
           product: state.product,
           count: next?.count ?? 0,
           favorite: state.favorite,
@@ -47,7 +36,7 @@ class ProductViewModel extends StateNotifier<ProductViewState> {
   }
 
   void toggleFavorite() {
-    state = ProductViewState(
+    state = (
       product: state.product,
       count: state.count,
       favorite: !state.favorite,
@@ -62,10 +51,11 @@ final productViewModelProviderFamily =
     ) {
       final cart = ref.read(cartProvider);
       final initialCount = cart.items[product.id]?.count ?? 0;
-      return ProductViewModel(
-        ProductViewState(product: product, count: initialCount),
-        ref,
-      );
+      return ProductViewModel((
+        product: product,
+        count: initialCount,
+        favorite: false,
+      ), ref);
     });
 
 class ProductView extends ConsumerView<ProductViewModel, ProductViewState> {
