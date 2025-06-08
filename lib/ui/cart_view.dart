@@ -3,39 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../cart.dart';
 
-class CartViewModel {
-  final Ref ref;
-  final CartState cartState;
-
-  CartViewModel(this.ref, this.cartState);
-
-  void clearCart() {
-    final cart = ref.read(cartProvider.notifier);
-    cart.clear();
-  }
-}
-
-// CartViewModelは自身のstateを持たないのでProviderにする
-// 代わりにcartProviderをwatchすることで更新が走る
-final cartViewModelProvider = Provider<CartViewModel>((ref) {
-  final cartState = ref.watch(cartProvider);
-  return CartViewModel(ref, cartState);
-});
-
+// ViewModelが不要な場合は単一のStateNotifierをread/watchしてOK
 class CartView extends ConsumerWidget {
   const CartView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.watch(cartViewModelProvider);
+    final viewModel = ref.watch(cartProvider);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Cart Items: ${viewModel.cartState.itemCount}'),
-        Text('Total Price: ${viewModel.cartState.totalPrice}'),
+        Text('Cart Items: ${viewModel.itemCount}'),
+        Text('Total Price: ${viewModel.totalPrice}'),
         TextButton(
           onPressed: () {
-            viewModel.clearCart();
+            ref.read(cartProvider.notifier).clear();
           },
           child: const Text('Clear Cart'),
         ),

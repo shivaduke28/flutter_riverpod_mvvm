@@ -3,23 +3,33 @@ import 'package:flutter_counter/product.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../cart.dart';
 
+@immutable
 class ProductViewState {
   final Product product;
   final int count;
+  final bool favorite;
 
-  ProductViewState({required this.product, this.count = 0});
+  const ProductViewState({
+    required this.product,
+    this.count = 0,
+    this.favorite = false,
+  });
 }
 
 class ProductViewModel extends StateNotifier<ProductViewState> {
   final Ref ref;
 
   ProductViewModel(super.state, this.ref) {
-    ref.listen<int>(
+    ref.listen<CartItem?>(
       cartProvider.select((cartState) {
-        return cartState.items[state.product.id]?.count ?? 0;
+        return cartState.items[state.product.id];
       }),
       (previous, next) {
-        state = ProductViewState(product: state.product, count: next);
+        state = ProductViewState(
+          product: state.product,
+          count: next?.count ?? 0,
+          favorite: state.favorite,
+        );
       },
     );
   }
@@ -33,6 +43,14 @@ class ProductViewModel extends StateNotifier<ProductViewState> {
     if (state.count <= 0) return;
     final cart = ref.read(cartProvider.notifier);
     cart.removeItem(state.product);
+  }
+
+  void toggleFavorite() {
+    state = ProductViewState(
+      product: state.product,
+      count: state.count,
+      favorite: !state.favorite,
+    );
   }
 }
 
@@ -69,6 +87,14 @@ class ProductView extends ConsumerWidget {
               onPressed: ref
                   .read(productViewModelProvider(product).notifier)
                   .incrementCount,
+            ),
+            Checkbox(
+              value: state.favorite,
+              onChanged: (_) {
+                ref
+                    .read(productViewModelProvider(product).notifier)
+                    .toggleFavorite();
+              },
             ),
           ],
         ),
