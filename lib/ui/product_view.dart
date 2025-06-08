@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_counter/product.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../cart.dart';
+import 'consumer_view.dart';
 
 @immutable
 class ProductViewState {
@@ -67,14 +68,21 @@ final productViewModelProviderFamily =
       );
     });
 
-class ProductView extends ConsumerWidget {
+class ProductView extends ConsumerView<ProductViewModel, ProductViewState> {
   final Product product;
 
   const ProductView({super.key, required this.product});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(productViewModelProviderFamily(product));
+  StateNotifierProvider<ProductViewModel, ProductViewState> get provider =>
+      productViewModelProviderFamily(product);
+
+  @override
+  Widget buildView(
+    BuildContext context,
+    ViewRef<ProductViewModel, ProductViewState> ref,
+  ) {
+    final state = ref.watchState();
     return Card(
       child: ListTile(
         title: Text(state.product.name),
@@ -84,23 +92,17 @@ class ProductView extends ConsumerWidget {
           children: [
             IconButton(
               icon: const Icon(Icons.remove),
-              onPressed: ref
-                  .read(productViewModelProviderFamily(product).notifier)
-                  .decrementCount,
+              onPressed: ref.readModel().decrementCount,
             ),
             Text(state.count.toString()),
             IconButton(
               icon: const Icon(Icons.add),
-              onPressed: ref
-                  .read(productViewModelProviderFamily(product).notifier)
-                  .incrementCount,
+              onPressed: ref.readModel().incrementCount,
             ),
             Checkbox(
               value: state.favorite,
               onChanged: (_) {
-                ref
-                    .read(productViewModelProviderFamily(product).notifier)
-                    .toggleFavorite();
+                ref.readModel().toggleFavorite();
               },
             ),
           ],

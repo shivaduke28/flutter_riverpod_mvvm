@@ -1,23 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod/src/state_notifier_provider.dart';
 
 import '../cart.dart';
+import 'consumer_view.dart';
 
 // ViewModelが不要な場合は単一のStateNotifierをread/watchしてOK
-class CartView extends ConsumerWidget {
+class CartView extends ConsumerView<Cart, CartState> {
   const CartView({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final viewModel = ref.watch(cartProvider);
+  StateNotifierProvider<Cart, CartState> get provider => cartProvider;
+
+  @override
+  Widget buildView(BuildContext context, ViewRef<Cart, CartState> ref) {
+    final state = ref.watchState();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Cart Items: ${viewModel.itemCount}'),
-        Text('Total Price: ${viewModel.totalPrice}'),
+        Text('Cart Items: ${state.itemCount}'),
+        Text('Total Price: ${state.totalPrice}'),
         TextButton(
           onPressed: () {
-            ref.read(cartProvider.notifier).clear();
+            ref.readModel().clear();
           },
           child: const Text('Clear Cart'),
         ),

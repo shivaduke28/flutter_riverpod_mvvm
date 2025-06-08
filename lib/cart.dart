@@ -83,5 +83,5 @@ class Cart extends StateNotifier<CartState> {
 }
 
 final cartProvider = StateNotifierProvider<Cart, CartState>(
-  (ref) => Cart(const CartState({}, itemCount: 0, totalPrice: 0.0)),
+  (ref) => Cart(const CartState(<int, CartItem>{}, itemCount: 0, totalPrice: 0.0)),
 );
