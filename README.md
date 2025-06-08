@@ -4,6 +4,9 @@
 
 - Viewが複数のModelをProviderを通して取得するのを避け、ViewModelを使用する
   - `ConsumerView<ViewModel, ViewState>`を使うことでRefを制限する
+- Viewの全ての状態をViewModelに持たせなくて良い
+  - EphemeralStateを持たせたい場合は`HookConsumerView<ViewModel, ViewState>`を使ってよい
+  - EphemeralStateを使った条件分岐などをViewに書くときはロジックがViewとViewModelに分散していないか気をつける
 - ViewModelは`StateNotifier<ViewState>`として実装する
 - ModelとViewModelに対してテストを書く
 - ModelがViewModelとして使える場合はViewModelとViewStateを省略してよい
