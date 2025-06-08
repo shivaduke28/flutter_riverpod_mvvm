@@ -1,16 +1,16 @@
-# flutter_counter
+# Flutter Riverpod MVVM example
 
-A new Flutter project.
+## MVVM
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Viewが複数のModelをProviderを通して取得するのを避け、ViewModelを使用する
+- ViewModelは`StateNotifier<ViewState>`として実装する
+- ModelとViewModelに対してテストを書く
+- ModelがViewModelとして使える場合はViewModelとViewStateを省略してよい
+  - e.g. `CartView`
+- トランザクション的にatomicにしたい状態は一つのStateにまとめる
+  - e.g. `CartState`
+- StateはImmutableにする
+- 親Viewは子ViewのViewModelを知らないようにする
+  - `ProductListView`は`ProductView`に`Product`を渡すが、`ProductViewModel`のことは知らない
+- ViewModelのProviderで別のProviderを`watch`しない
+  - ViewModelとViewのライフサイクルを合わせてStateだけを更新する

@@ -51,10 +51,14 @@ class Cart extends StateNotifier<CartState> {
   void removeItem(Product product) {
     if (_items.containsKey(product.id)) {
       final existingItem = _items[product.id]!;
-      _items[product.id] = CartItem(
-        product: product,
-        count: existingItem.count - 1,
-      );
+      if (existingItem.count <= 1) {
+        _items.remove(product.id);
+      } else {
+        _items[product.id] = CartItem(
+          product: product,
+          count: existingItem.count - 1,
+        );
+      }
     }
     _updateState();
   }

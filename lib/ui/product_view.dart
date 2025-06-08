@@ -54,11 +54,18 @@ class ProductViewModel extends StateNotifier<ProductViewState> {
   }
 }
 
-final productViewModelProvider =
-    StateNotifierProvider.family<ProductViewModel, ProductViewState, Product>(
-      (ref, product) =>
-          ProductViewModel(ProductViewState(product: product), ref),
-    );
+final productViewModelProviderFamily =
+    StateNotifierProvider.family<ProductViewModel, ProductViewState, Product>((
+      ref,
+      product,
+    ) {
+      final cart = ref.read(cartProvider);
+      final initialCount = cart.items[product.id]?.count ?? 0;
+      return ProductViewModel(
+        ProductViewState(product: product, count: initialCount),
+        ref,
+      );
+    });
 
 class ProductView extends ConsumerWidget {
   final Product product;
@@ -67,7 +74,7 @@ class ProductView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(productViewModelProvider(product));
+    final state = ref.watch(productViewModelProviderFamily(product));
     return Card(
       child: ListTile(
         title: Text(state.product.name),
@@ -78,21 +85,21 @@ class ProductView extends ConsumerWidget {
             IconButton(
               icon: const Icon(Icons.remove),
               onPressed: ref
-                  .read(productViewModelProvider(product).notifier)
+                  .read(productViewModelProviderFamily(product).notifier)
                   .decrementCount,
             ),
             Text(state.count.toString()),
             IconButton(
               icon: const Icon(Icons.add),
               onPressed: ref
-                  .read(productViewModelProvider(product).notifier)
+                  .read(productViewModelProviderFamily(product).notifier)
                   .incrementCount,
             ),
             Checkbox(
               value: state.favorite,
               onChanged: (_) {
                 ref
-                    .read(productViewModelProvider(product).notifier)
+                    .read(productViewModelProviderFamily(product).notifier)
                     .toggleFavorite();
               },
             ),
