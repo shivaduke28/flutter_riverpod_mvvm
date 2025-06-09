@@ -110,15 +110,15 @@ abstract class HookConsumerView<NotifierT extends Notifier<T>, T>
   Widget buildView(BuildContext context, ViewRef<NotifierT, T> ref);
 }
 
-abstract class HookFamilyConsumerView<
+abstract class FamilyHookConsumerView<
   NotifierT extends FamilyNotifier<T, Arg>,
   T,
   Arg
 >
     extends HookConsumerWidget {
-  const HookFamilyConsumerView({required this.arg, super.key});
-
   final Arg arg;
+
+  const FamilyHookConsumerView({required this.arg, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -132,4 +132,82 @@ abstract class HookFamilyConsumerView<
     BuildContext context,
     FamilyViewRefImpl<NotifierT, T, Arg> ref,
   );
+}
+
+abstract class StatefulConsumerView<NotifierT extends Notifier<T>, T>
+    extends ConsumerStatefulWidget {
+  const StatefulConsumerView({super.key});
+
+  NotifierProvider<NotifierT, T> get provider;
+
+  @override
+  ConsumerState<StatefulConsumerView<NotifierT, T>> createState() =>
+      _StatefulConsumerViewState<NotifierT, T>();
+
+  // サブクラスでbuildViewを実装
+  Widget buildView(
+    BuildContext context,
+    ViewRef<NotifierT, T> ref,
+    ConsumerState state,
+  );
+}
+
+// 実装用のStateクラス
+class _StatefulConsumerViewState<NotifierT extends Notifier<T>, T>
+    extends ConsumerState<StatefulConsumerView<NotifierT, T>> {
+  @override
+  void initState() {
+    super.initState();
+    // WidgetRefはbuild内でのみ有効なので、viewRefはbuildで初期化
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewRef = ViewRefImpl<NotifierT, T>(ref, widget.provider);
+    return widget.buildView(context, viewRef, this);
+  }
+}
+
+abstract class FamilyStatefulConsumerView<
+  NotifierT extends FamilyNotifier<T, Arg>,
+  T,
+  Arg
+>
+    extends ConsumerStatefulWidget {
+  final Arg arg;
+
+  const FamilyStatefulConsumerView({required this.arg, super.key});
+
+  NotifierProviderFamily<NotifierT, T, Arg> get provider;
+
+  @override
+  ConsumerState<FamilyStatefulConsumerView<NotifierT, T, Arg>> createState() =>
+      _FamilyStatefulConsumerViewState<NotifierT, T, Arg>();
+
+  // サブクラスでbuildViewを実装
+  Widget buildView(
+    BuildContext context,
+    ViewRef<NotifierT, T> ref,
+    ConsumerState state,
+  );
+}
+
+class _FamilyStatefulConsumerViewState<
+  NotifierT extends FamilyNotifier<T, Arg>,
+  T,
+  Arg
+>
+    extends ConsumerState<FamilyStatefulConsumerView<NotifierT, T, Arg>> {
+  _FamilyStatefulConsumerViewState();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewRef = FamilyViewRefImpl(ref, widget.provider, widget.arg);
+    return widget.buildView(context, viewRef, this);
+  }
 }
