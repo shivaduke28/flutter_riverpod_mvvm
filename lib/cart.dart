@@ -24,10 +24,8 @@ class CartState {
   });
 }
 
-class Cart extends StateNotifier<CartState> {
+class Cart extends Notifier<CartState> {
   final Map<int, CartItem> _items = {};
-
-  Cart(super.state);
 
   Iterable<CartItem> get items => _items.values;
 
@@ -80,8 +78,11 @@ class Cart extends StateNotifier<CartState> {
       totalPrice: totalPrice,
     );
   }
+
+  @override
+  CartState build() {
+    return const CartState(<int, CartItem>{}, itemCount: 0, totalPrice: 0.0);
+  }
 }
 
-final cartProvider = StateNotifierProvider<Cart, CartState>(
-  (ref) => Cart(const CartState(<int, CartItem>{}, itemCount: 0, totalPrice: 0.0)),
-);
+final cartProvider = NotifierProvider<Cart, CartState>(Cart.new);

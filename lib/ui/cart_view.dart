@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:riverpod/src/state_notifier_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../cart.dart';
 import 'consumer_view.dart';
@@ -9,7 +9,7 @@ class CartView extends ConsumerView<Cart, CartState> {
   const CartView({super.key});
 
   @override
-  StateNotifierProvider<Cart, CartState> get provider => cartProvider;
+  NotifierProvider<Cart, CartState> get provider => cartProvider;
 
   @override
   Widget buildView(BuildContext context, ViewRef<Cart, CartState> ref) {

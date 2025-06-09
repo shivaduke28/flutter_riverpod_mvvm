@@ -6,10 +6,9 @@ import 'consumer_view.dart';
 
 typedef ProductViewState = ({Product product, int count, bool favorite});
 
-class ProductViewModel extends StateNotifier<ProductViewState> {
-  final Ref ref;
-
-  ProductViewModel(super.state, this.ref) {
+class ProductViewModel extends FamilyNotifier<ProductViewState, Product> {
+  @override
+  ProductViewState build(Product product) {
     ref.listen<CartItem?>(
       cartProvider.select((cartState) {
         return cartState.items[state.product.id];
@@ -22,6 +21,10 @@ class ProductViewModel extends StateNotifier<ProductViewState> {
         );
       },
     );
+
+    final cart = ref.read(cartProvider);
+    final initialCount = cart.items[product.id]?.count ?? 0;
+    return (product: product, count: initialCount, favorite: false);
   }
 
   void incrementCount() {
@@ -45,27 +48,18 @@ class ProductViewModel extends StateNotifier<ProductViewState> {
 }
 
 final productViewModelProviderFamily =
-    StateNotifierProvider.family<ProductViewModel, ProductViewState, Product>((
-      ref,
-      product,
-    ) {
-      final cart = ref.read(cartProvider);
-      final initialCount = cart.items[product.id]?.count ?? 0;
-      return ProductViewModel((
-        product: product,
-        count: initialCount,
-        favorite: false,
-      ), ref);
-    });
+    NotifierProvider.family<ProductViewModel, ProductViewState, Product>(
+      ProductViewModel.new,
+    );
 
-class ProductView extends ConsumerView<ProductViewModel, ProductViewState> {
-  final Product product;
+class ProductView
+    extends FamilyConsumerView<ProductViewModel, ProductViewState, Product> {
 
-  const ProductView({super.key, required this.product});
+  const ProductView({required super.arg, super.key});
 
   @override
-  StateNotifierProvider<ProductViewModel, ProductViewState> get provider =>
-      productViewModelProviderFamily(product);
+  NotifierProviderFamily<ProductViewModel, ProductViewState, Product>
+  get provider => productViewModelProviderFamily;
 
   @override
   Widget buildView(

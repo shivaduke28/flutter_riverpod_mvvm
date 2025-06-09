@@ -25,7 +25,7 @@ class MyApp extends ConsumerWidget {
               const CartView(),
               const Text('Product List:'),
               ...ref.watch(productListProvider).map((product) {
-                return ProductView(product: product);
+                return ProductView(arg: product);
               }),
             ],
           ),
