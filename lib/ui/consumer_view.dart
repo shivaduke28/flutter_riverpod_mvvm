@@ -11,7 +11,8 @@ abstract class ViewRef<NotifierT, T> {
   NotifierT watchModel();
 }
 
-class ViewRefImpl<NotifierT extends Notifier<T>, T> extends ViewRef<NotifierT, T> {
+class ViewRefImpl<NotifierT extends Notifier<T>, T>
+    extends ViewRef<NotifierT, T> {
   final WidgetRef ref;
   final NotifierProvider<NotifierT, T> provider;
 
@@ -51,7 +52,11 @@ class FamilyViewRefImpl<NotifierT extends FamilyNotifier<T, Arg>, T, Arg>
   NotifierT watchModel() => ref.watch(provider(arg).notifier);
 }
 
-abstract class FamilyConsumerView<NotifierT extends FamilyNotifier<T, Arg>, T, Arg>
+abstract class FamilyConsumerView<
+  NotifierT extends FamilyNotifier<T, Arg>,
+  T,
+  Arg
+>
     extends ConsumerWidget {
   const FamilyConsumerView({required this.arg, super.key});
 
@@ -67,10 +72,14 @@ abstract class FamilyConsumerView<NotifierT extends FamilyNotifier<T, Arg>, T, A
   // getterを継承する形でProviderを宣言させる
   NotifierProviderFamily<NotifierT, T, Arg> get provider;
 
-  Widget buildView(BuildContext context, FamilyViewRefImpl<NotifierT, T, Arg> ref);
+  Widget buildView(
+    BuildContext context,
+    FamilyViewRefImpl<NotifierT, T, Arg> ref,
+  );
 }
 
-abstract class ConsumerView<NotifierT extends Notifier<T>, T> extends ConsumerWidget {
+abstract class ConsumerView<NotifierT extends Notifier<T>, T>
+    extends ConsumerWidget {
   const ConsumerView({super.key});
 
   @override
@@ -99,4 +108,28 @@ abstract class HookConsumerView<NotifierT extends Notifier<T>, T>
   NotifierProvider<NotifierT, T> get provider;
 
   Widget buildView(BuildContext context, ViewRef<NotifierT, T> ref);
+}
+
+abstract class HookFamilyConsumerView<
+  NotifierT extends FamilyNotifier<T, Arg>,
+  T,
+  Arg
+>
+    extends HookConsumerWidget {
+  const HookFamilyConsumerView({required this.arg, super.key});
+
+  final Arg arg;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewRef = FamilyViewRefImpl<NotifierT, T, Arg>(ref, provider, arg);
+    return buildView(context, viewRef);
+  }
+
+  NotifierProviderFamily<NotifierT, T, Arg> get provider;
+
+  Widget buildView(
+    BuildContext context,
+    FamilyViewRefImpl<NotifierT, T, Arg> ref,
+  );
 }
