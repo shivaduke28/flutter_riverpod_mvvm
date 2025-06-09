@@ -7,7 +7,7 @@
 - Viewの全ての状態をViewModelに持たせなくて良い
   - EphemeralStateを持たせたい場合は`HookConsumerView<ViewModel, ViewState>`を使ってよい
   - EphemeralStateを使った条件分岐などをViewに書くときはロジックがViewとViewModelに分散していないか気をつける
-- ViewModelは`StateNotifier<ViewState>`として実装する
+- ViewModelは`Notifier<ViewState>`または`FamilyNotifier<ViewState, Arg>`として実装する
 - ModelとViewModelに対してテストを書く
 - ModelがViewModelとして使える場合はViewModelとViewStateを省略してよい
   - e.g. `CartView`
