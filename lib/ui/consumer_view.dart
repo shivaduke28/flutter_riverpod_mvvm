@@ -1,57 +1,57 @@
 import 'package:flutter/cupertino.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-abstract class ViewRef<VM, S> {
-  S readState();
+abstract class ViewRef<NotifierT, T> {
+  T readState();
 
-  S watchState();
+  T watchState();
 
-  VM readModel();
+  NotifierT readModel();
 
-  VM watchModel();
+  NotifierT watchModel();
 }
 
-class ViewRefImpl<VM extends Notifier<S>, S> extends ViewRef<VM, S> {
+class ViewRefImpl<NotifierT extends Notifier<T>, T> extends ViewRef<NotifierT, T> {
   final WidgetRef ref;
-  final NotifierProvider<VM, S> provider;
+  final NotifierProvider<NotifierT, T> provider;
 
   ViewRefImpl(this.ref, this.provider);
 
   @override
-  S readState() => ref.read(provider);
+  T readState() => ref.read(provider);
 
   @override
-  S watchState() => ref.watch(provider);
+  T watchState() => ref.watch(provider);
 
   @override
-  VM readModel() => ref.read(provider.notifier);
+  NotifierT readModel() => ref.read(provider.notifier);
 
   @override
-  VM watchModel() => ref.watch(provider.notifier);
+  NotifierT watchModel() => ref.watch(provider.notifier);
 }
 
-class FamilyViewRefImpl<VM extends FamilyNotifier<S, Arg>, S, Arg>
-    extends ViewRef<VM, S> {
+class FamilyViewRefImpl<NotifierT extends FamilyNotifier<T, Arg>, T, Arg>
+    extends ViewRef<NotifierT, T> {
   final WidgetRef ref;
-  final NotifierProviderFamily<VM, S, Arg> provider;
+  final NotifierProviderFamily<NotifierT, T, Arg> provider;
   final Arg arg;
 
   FamilyViewRefImpl(this.ref, this.provider, this.arg);
 
   @override
-  S readState() => ref.read(provider(arg));
+  T readState() => ref.read(provider(arg));
 
   @override
-  S watchState() => ref.watch(provider(arg));
+  T watchState() => ref.watch(provider(arg));
 
   @override
-  VM readModel() => ref.read(provider(arg).notifier);
+  NotifierT readModel() => ref.read(provider(arg).notifier);
 
   @override
-  VM watchModel() => ref.watch(provider(arg).notifier);
+  NotifierT watchModel() => ref.watch(provider(arg).notifier);
 }
 
-abstract class FamilyConsumerView<VM extends FamilyNotifier<S, Arg>, S, Arg>
+abstract class FamilyConsumerView<NotifierT extends FamilyNotifier<T, Arg>, T, Arg>
     extends ConsumerWidget {
   const FamilyConsumerView({required this.arg, super.key});
 
@@ -59,44 +59,44 @@ abstract class FamilyConsumerView<VM extends FamilyNotifier<S, Arg>, S, Arg>
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewRef = FamilyViewRefImpl<VM, S, Arg>(ref, provider, arg);
+    final viewRef = FamilyViewRefImpl<NotifierT, T, Arg>(ref, provider, arg);
     return buildView(context, viewRef);
   }
 
   // NOTE: Providerをコンストラクタで渡すと継承クラスのコンストラクタをconstにできなくなるので
   // getterを継承する形でProviderを宣言させる
-  NotifierProviderFamily<VM, S, Arg> get provider;
+  NotifierProviderFamily<NotifierT, T, Arg> get provider;
 
-  Widget buildView(BuildContext context, FamilyViewRefImpl<VM, S, Arg> ref);
+  Widget buildView(BuildContext context, FamilyViewRefImpl<NotifierT, T, Arg> ref);
 }
 
-abstract class ConsumerView<VM extends Notifier<S>, S> extends ConsumerWidget {
+abstract class ConsumerView<NotifierT extends Notifier<T>, T> extends ConsumerWidget {
   const ConsumerView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewRef = ViewRefImpl<VM, S>(ref, provider);
+    final viewRef = ViewRefImpl<NotifierT, T>(ref, provider);
     return buildView(context, viewRef);
   }
 
   // NOTE: Providerをコンストラクタで渡すと継承クラスのコンストラクタをconstにできなくなるので
   // getterを継承する形でProviderを宣言させる
-  NotifierProvider<VM, S> get provider;
+  NotifierProvider<NotifierT, T> get provider;
 
-  Widget buildView(BuildContext context, ViewRef<VM, S> ref);
+  Widget buildView(BuildContext context, ViewRef<NotifierT, T> ref);
 }
 
-abstract class HookConsumerView<VM extends Notifier<S>, S>
+abstract class HookConsumerView<NotifierT extends Notifier<T>, T>
     extends HookConsumerWidget {
   const HookConsumerView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewRef = ViewRefImpl<VM, S>(ref, provider);
+    final viewRef = ViewRefImpl<NotifierT, T>(ref, provider);
     return buildView(context, viewRef);
   }
 
-  NotifierProvider<VM, S> get provider;
+  NotifierProvider<NotifierT, T> get provider;
 
-  Widget buildView(BuildContext context, ViewRef<VM, S> ref);
+  Widget buildView(BuildContext context, ViewRef<NotifierT, T> ref);
 }
